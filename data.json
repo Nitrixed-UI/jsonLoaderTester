@@ -1,0 +1,274 @@
+{
+    "students": [
+        {
+            "id": 1,
+            "name": "Freddy",
+            "age": 22,
+            "full-time": true
+        },
+        {
+            "id": 2,
+            "name": "Joe",
+            "age": 33,
+            "full-time": false
+        },
+        {
+            "id": 3,
+            "name": "Alice",
+            "age": 28,
+            "full-time": true
+        },
+        {
+            "id": 4,
+            "name": "Sarah",
+            "age": 24,
+            "full-time": true
+        },
+        {
+            "id": 5,
+            "name": "Mitchell",
+            "age": 16,
+            "full-time": true
+        },
+        {
+            "id": 6,
+            "name": "Emma",
+            "age": 22,
+            "full-time": true
+        },
+        {
+            "id": 7,
+            "name": "David",
+            "age": 27,
+            "full-time": false
+        },
+        {
+            "id": 8,
+            "name": "Lisa",
+            "age": 25,
+            "full-time": true
+        },
+        {
+            "id": 9,
+            "name": "John",
+            "age": 29,
+            "full-time": false
+        },
+        {
+            "id": 10,
+            "name": "Kate",
+            "age": 23,
+            "full-time": true
+        },
+        {
+            "id": 11,
+            "name": "Robert",
+            "age": 26,
+            "full-time": true
+        },
+        {
+            "id": 12,
+            "name": "Jessica",
+            "age": 31,
+            "full-time": false
+        },
+        {
+            "id": 13,
+            "name": "Daniel",
+            "age": 20,
+            "full-time": true
+        },
+        {
+            "id": 14,
+            "name": "Ashley",
+            "age": 35,
+            "full-time": false
+        },
+        {
+            "id": 15,
+            "name": "Chris",
+            "age": 24,
+            "full-time": true
+        },
+        {
+            "id": 16,
+            "name": "Rachel",
+            "age": 27,
+            "full-time": false
+        },
+        {
+            "id": 17,
+            "name": "Kevin",
+            "age": 22,
+            "full-time": true
+        },
+        {
+            "id": 18,
+            "name": "Amanda",
+            "age": 29,
+            "full-time": false
+        },
+        {
+            "id": 19,
+            "name": "Brian",
+            "age": 32,
+            "full-time": true
+        },
+        {
+            "id": 20,
+            "name": "Nicole",
+            "age": 25,
+            "full-time": false
+        },
+        {
+            "id": 21,
+            "name": "Steven",
+            "age": 28,
+            "full-time": true
+        },
+        {
+            "id": 22,
+            "name": "Michelle",
+            "age": 23,
+            "full-time": false
+        },
+        {
+            "id": 23,
+            "name": "Anthony",
+            "age": 30,
+            "full-time": true
+        },
+        {
+            "id": 24,
+            "name": "Lauren",
+            "age": 26,
+            "full-time": false
+        },
+        {
+            "id": 25,
+            "name": "Matthew",
+            "age": 21,
+            "full-time": true
+        },
+        {
+            "id": 26,
+            "name": "Zoe",
+            "age": 16,
+            "full-time": false
+        },
+        {
+            "id": 27,
+            "name": "Omar",
+            "age": 17,
+            "full-time": true
+        },
+        {
+            "id": 28,
+            "name": "Priya",
+            "age": 18,
+            "full-time": true
+        },
+        {
+            "id": 29,
+            "name": "Tom",
+            "age": 19,
+            "full-time": true
+        },
+        {
+            "id": 30,
+            "name": "Helen",
+            "age": 40,
+            "full-time": false
+        },
+        {
+            "id": 31,
+            "name": "George",
+            "age": 55,
+            "full-time": false
+        },
+        {
+            "id": 32,
+            "name": "Nora",
+            "age": 65,
+            "full-time": false
+        },
+        {
+            "id": 33,
+            "name": "Frank",
+            "age": 72,
+            "full-time": false
+        },
+        {
+            "id": 34,
+            "name": "Maya",
+            "age": 14,
+            "full-time": true
+        },
+        {
+            "id": 35,
+            "name": "Oliver",
+            "age": 80,
+            "full-time": false
+        },
+        {
+            "id": 36,
+            "name": "Chloe",
+            "age": 13,
+            "full-time": true
+        },
+        {
+            "id": 37,
+            "name": "Ethan",
+            "age": 15,
+            "full-time": true
+        },
+        {
+            "id": 38,
+            "name": "Susan",
+            "age": 68,
+            "full-time": true
+        },
+        {
+            "id": 39,
+            "name": "Victor",
+            "age": 58,
+            "full-time": false
+        },
+        {
+            "id": 40,
+            "name": "Bella",
+            "age": 34,
+            "full-time": true
+        },
+        {
+            "id": 41,
+            "name": "Ian",
+            "age": 45,
+            "full-time": false
+        },
+        {
+            "id": 42,
+            "name": "Grace",
+            "age": 90,
+            "full-time": false
+        },
+        {
+            "id": 43,
+            "name": "Hugo",
+            "age": 38,
+            "full-time": true
+        },
+        {
+            "id": 44,
+            "name": "Yara",
+            "age": 21,
+            "full-time": false
+        },
+        {
+            "id": 45,
+            "name": "Lucas",
+            "age": 85,
+            "full-time": false
+        }
+    ]
+}
