@@ -1,26 +1,51 @@
 import json
-import random
-from typing import Optional
 import csv
 import os
+from pathlib import Path
+from typing import Optional
 
-DATA_FILE = r"C:\Users\bryso\OneDrive\Desktop\VS projects\json testing\data.json"
+# ------------------------------------------------------------------
+# Configuration / Path Resolution
+# ------------------------------------------------------------------
+# Environment variable name to override data file location
+ENV_VAR = "JSON_LOADER_DATA_FILE"
 
-with open(DATA_FILE, 'r') as file:
-    data = json.load(file)
+# Default path: keep data.json next to this script so sharing the folder works
+DEFAULT_DATA_FILE = Path(__file__).with_name("data.json")
 
-def load_data(filepath: str = DATA_FILE):
-    """Reload data from disk to pick up external edits."""
+# Chosen data file (override if env var is set)
+DATA_FILE = Path(os.environ.get(ENV_VAR, DEFAULT_DATA_FILE))
+
+# Ensure parent directory exists (env override might point somewhere else)
+DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+# In-memory data store. Will be populated by load_data() when first called.
+data = {"students": []}
+
+def load_data(filepath: Path = DATA_FILE):
+    """Load (or reload) JSON data from disk into memory.
+
+    If the file does not exist, create it with an empty structure.
+    If the file is corrupt (JSONDecodeError), warn and keep existing in-memory data.
+    """
     global data
-    try:
-        with open(filepath, 'r') as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        print("Data file missing; creating new structure.")
+    if not filepath.exists():
+        # Initialize empty data file
         data = {"students": []}
+        save_data(filepath)
+        return
+    try:
+        with filepath.open('r', encoding='utf-8') as f:
+            data = json.load(f)
     except json.JSONDecodeError as e:
-        print(f"JSON decode error while reloading: {e}")
-        # keep previous in-memory data
+        print(f"Warning: Could not decode JSON ({e}). Keeping current in-memory data.")
+
+
+def save_data(filepath: Path = DATA_FILE):
+    """Persist current in-memory data back to the JSON file."""
+    # Write directly (simple approach). For higher safety, implement atomic temp write.
+    with filepath.open('w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4)
 
 
 def make_new_student(name, age, full_time):
@@ -55,17 +80,19 @@ def change_student_info(student_id, name=None, age=None, full_time=None):
         return student
     return None
 
-def save_data(filepath: str = DATA_FILE):
+def save_data(filepath: Path = DATA_FILE):
     """Persist current in-memory data back to the JSON file."""
-    with open(filepath, 'w') as f:
+    # Write directly (simple approach). For higher safety, implement atomic temp write.
+    with filepath.open('w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
+
 
 def clear_screen():
     """Clear the console in a cross-platform way."""
     try:
         os.system('cls' if os.name == 'nt' else 'clear')
     except Exception:
-        pass  # fail silently if clearing not possible
+        pass
 
 def pause(msg: str = "Press Enter to continue..."):
     try:
@@ -74,8 +101,8 @@ def pause(msg: str = "Press Enter to continue..."):
         pass
 
 def export_csv(csv_path: str = "students.csv") -> str:
-    """Export current students to a CSV file. Returns path written."""
-    load_data()
+    """Export current students to a CSV file. Returns absolute path written."""
+    load_data()  # refresh first
     fieldnames = ["id", "name", "age", "full-time"]
     with open(csv_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -159,8 +186,7 @@ def format_student(student: dict) -> str:
             f"Full-time: {'Yes' if student['full-time'] else 'No'}")
 
 def student_menu(student_id: int):
-    """Interactive menu to inspect and modify a single student record.
-    Reloads data before every action so external JSON edits are seen."""
+    """Interactive menu to inspect and modify a single student record."""
     while True:
         load_data()
         clear_screen()
@@ -217,7 +243,6 @@ def student_menu(student_id: int):
         else:
             print("Unknown option.")
             pause()
-        # After any mutating action (except delete which returns) we persist automatically
         if choice in ('n','name','a','age','t','toggle'):
             save_data()
 
@@ -255,6 +280,7 @@ def ensure_students():
             return
         print("Import failed or produced zero records. Please try again.")
         pause("Press Enter to retry...")
+
 
 def main_menu():
     while True:
@@ -319,9 +345,12 @@ def main_menu():
             print("Unknown option.")
             pause()
 
+
 def main():
+    load_data()
     ensure_students()
     main_menu()
+
 
 if __name__ == "__main__":
     main()

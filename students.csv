@@ -44,5 +44,3 @@ id,name,age,full-time
 43,Hugo,38,True
 44,Yara,21,False
 45,Lucas,85,False
-9999,TEST_USER,999999999999,True
-10000,TEST_USER2,99999999999,False
