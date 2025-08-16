@@ -4,36 +4,33 @@ import csv
 import os
 from pathlib import Path
 
-# Portable data file path: data.json resides next to this script.
+# File where student data is stored (next to this script)
 DATA_FILE = Path(__file__).with_name("data.json")
 
-# Initialize data structure: load if file exists, else start empty.
+# Load existing data or start with empty list
 if DATA_FILE.exists():
-    with DATA_FILE.open('r', encoding='utf-8') as file:
-        try:
+    try:
+        with DATA_FILE.open('r', encoding='utf-8') as file:
             data = json.load(file)
-        except json.JSONDecodeError:
-            print(f"Warning: Corrupt JSON in {DATA_FILE}. Starting with empty dataset.")
-            data = {"students": []}
+    except json.JSONDecodeError:
+        data = {"students": []}
 else:
     data = {"students": []}
 
 def load_data(filepath: str = str(DATA_FILE)):
-    """Reload data from disk to pick up external edits.
-    Creates a new empty file structure if the file is missing.
-    """
+    """Load data from disk (create empty if missing)."""
     global data
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
     except FileNotFoundError:
-        print("Data file missing; creating new structure.")
         data = {"students": []}
         save_data(filepath)
-    except json.JSONDecodeError as e:
-        print(f"JSON decode error while reloading: {e}. Keeping previous in-memory data.")
+    except json.JSONDecodeError:
+        pass  # keep old data if file is corrupt
 
 def make_new_student(name, age, full_time):
+    """Add a new student to memory."""
     new_student = {
         "id": len(data['students']) + 1,
         "name": name,
@@ -44,16 +41,19 @@ def make_new_student(name, age, full_time):
     return new_student
 
 def find_student(student_id):
+    """Find a student by id."""
     for student in data['students']:
         if student['id'] == student_id:
             return student
     return None
 
 def remove_student(student_id):
+    """Delete a student by id."""
     global data
-    data['students'] = [student for student in data['students'] if student['id'] != student_id]
+    data['students'] = [s for s in data['students'] if s['id'] != student_id]
 
 def change_student_info(student_id, name=None, age=None, full_time=None):
+    """Update fields for one student."""
     student = find_student(student_id)
     if student:
         if name is not None:
@@ -66,25 +66,26 @@ def change_student_info(student_id, name=None, age=None, full_time=None):
     return None
 
 def save_data(filepath: str = str(DATA_FILE)):
-    """Persist current in-memory data back to the JSON file."""
+    """Write data to disk."""
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
 def clear_screen():
-    """Clear the console in a cross-platform way."""
+    """Clear console output."""
     try:
         os.system('cls' if os.name == 'nt' else 'clear')
     except Exception:
-        pass  # fail silently if clearing not possible
+        pass
 
-def pause(msg: str = "Press Enter to continue..."):
+def pause(msg: str = "Press Enter to continue..."):  
+    """Simple pause for user input."""
     try:
         input(msg)
     except EOFError:
         pass
 
 def export_csv(csv_path: str = "students.csv") -> str:
-    """Export current students to a CSV file. Returns path written."""
+    """Save students to CSV and return path."""
     load_data()
     fieldnames = ["id", "name", "age", "full-time"]
     with open(csv_path, 'w', newline='', encoding='utf-8') as f:
@@ -95,17 +96,12 @@ def export_csv(csv_path: str = "students.csv") -> str:
     return os.path.abspath(csv_path)
 
 def _parse_bool(val: str) -> bool:
+    """Turn a text value into a bool."""
     v = val.strip().lower()
     return v in ("1", "true", "t", "yes", "y")
 
 def import_csv(csv_path: str, mode: str = 'merge') -> int:
-    """Import students from a CSV file.
-
-    mode:
-      'merge' (default): add rows; if ID collides or missing/invalid, assign next id.
-      'replace': replace entire student list with file contents (reindex preserved from file; fix duplicates by renumbering sequentially starting at 1).
-    Returns number of records imported (added or replaced count).
-    """
+    """Read students from CSV (merge or replace)."""
     global data
     load_data()
     if not os.path.exists(csv_path):
@@ -165,61 +161,60 @@ def import_csv(csv_path: str, mode: str = 'merge') -> int:
     return added
 
 def format_student(student: dict) -> str:
+    """Return a simple text line for a student."""
     return (f"ID: {student['id']} | Name: {student['name']} | Age: {student['age']} | "
             f"Full-time: {'Yes' if student['full-time'] else 'No'}")
 
 def student_menu(student_id: int):
-    """Interactive menu to inspect and modify a single student record.
-    Reloads data before every action so external JSON edits are seen."""
+    """Menu for changing one student."""
     while True:
         load_data()
         clear_screen()
         student = find_student(student_id)
         if not student:
-            print("Student no longer exists (possibly removed externally). Exiting.")
+            print("Student removed.")
             return
-        print("\nSelected Student -> " + format_student(student))
-        print("Actions: [v]iew  [n]ame  [a]ge  [t]oggle full-time  [d]elete  [s]ave  [r]eload  [q]uit")
+        print("\nStudent -> " + format_student(student))
+        print("[v]iew  [n]ame  [a]ge  [t]oggle full-time  [d]elete  [s]ave  [r]eload  [q]uit")
         choice = input("> ").strip().lower()
         if choice in ("v", "view"):
             print(format_student(student))
             pause()
         elif choice in ("n", "name"):
-            new_name = input("New name (blank = cancel): ").strip()
+            new_name = input("New name: ").strip()
             if new_name:
                 student['name'] = new_name
-                print("Updated name.")
+                print("Name updated.")
             pause()
         elif choice in ("a", "age"):
-            new_age = input("New age (blank = cancel): ").strip()
-            if new_age:
-                if new_age.isdigit():
-                    student['age'] = int(new_age)
-                    print("Updated age.")
-                else:
-                    print("Invalid age; must be a number.")
+            new_age = input("New age: ").strip()
+            if new_age and new_age.isdigit():
+                student['age'] = int(new_age)
+                print("Age updated.")
+            else:
+                print("Invalid age.")
             pause()
         elif choice in ("t", "toggle"):
             student['full-time'] = not student['full-time']
-            print("Toggled full-time status.")
+            print("Full-time toggled.")
             pause()
         elif choice in ("d", "delete"):
-            confirm = input("Type DELETE to confirm removal: ")
+            confirm = input("Type DELETE to confirm: ")
             if confirm == "DELETE":
                 remove_student(student['id'])
                 save_data()
-                print("Student deleted.")
+                print("Deleted.")
                 pause()
                 return
             else:
-                print("Deletion cancelled.")
+                print("Cancelled.")
             pause()
         elif choice in ("s", "save"):
             save_data()
-            print("Changes saved to disk.")
+            print("Saved.")
             pause()
         elif choice in ("r", "reload"):
-            print("Reloaded from disk.")
+            print("Reloaded.")
             pause()
             continue
         elif choice in ("q", "quit", "exit"):
@@ -227,13 +222,13 @@ def student_menu(student_id: int):
         else:
             print("Unknown option.")
             pause()
-        # After any mutating action (except delete which returns) we persist automatically
         if choice in ('n','name','a','age','t','toggle'):
             save_data()
 
 def list_students(limit: Optional[int] = None):
+    """Print all students (optionally limited)."""
     students = data['students']
-    print(f"Total students: {len(students)}")
+    print(f"Total: {len(students)}")
     shown = 0
     for s in students:
         print(format_student(s))
@@ -242,34 +237,34 @@ def list_students(limit: Optional[int] = None):
             break
 
 def prompt_bool(prompt: str, default: bool = True) -> bool:
+    """Yes/No prompt returning bool."""
     raw = input(f"{prompt} ({'Y/n' if default else 'y/N'}): ").strip().lower()
     if raw == '':
         return default
     return raw in ('y', 'yes', 'true', '1')
 
 def ensure_students():
-    """Ensure there is at least one student; force CSV import if empty."""
+    """If no students, force CSV import."""
     load_data()
-    if data.get('students') and len(data['students']) > 0:
+    if data.get('students'):
         return
     while True:
         clear_screen()
-        print("No students found in data file.")
+        print("No students found.")
         default_csv = 'students.csv'
-        path = input(f"Import required. CSV path (blank={default_csv}): ").strip() or default_csv
-        mode_full = 'merge'
-        count = import_csv(path, mode_full)
-        if data.get('students') and len(data['students']) > 0:
-            print(f"Imported {count} student record(s).")
+        path = input(f"Import CSV path (blank={default_csv}): ").strip() or default_csv
+        count = import_csv(path, 'merge')
+        if data.get('students'):
+            print(f"Imported {count}.")
             pause()
             return
-        print("Import failed or produced zero records. Please try again.")
-        pause("Press Enter to retry...")
-
+        print("Import failed. Try again.")
+        pause()
 
 def main_menu():
+    """Main loop for the app."""
     while True:
-        load_data()  # always refresh to see external edits
+        load_data()
         ensure_students()
         clear_screen()
         print("Main Menu")
@@ -310,14 +305,14 @@ def main_menu():
             pause()
         elif choice in ('i', 'import'):
             path = input("CSV path (blank=students.csv): ").strip() or 'students.csv'
-            mode = input("Mode: [m]erge (default) or [r]eplace? ").strip().lower()
+            mode = input("Mode: [m]erge or [r]eplace? ").strip().lower()
             mode_full = 'replace' if mode in ('r','replace') else 'merge'
             count = import_csv(path, mode_full)
-            print(f"Imported {count} record(s) using mode '{mode_full}'.")
+            print(f"Imported {count} ({mode_full}).")
             pause()
         elif choice in ('s', 'save'):
             save_data()
-            print("Saved to disk.")
+            print("Saved.")
             pause()
         elif choice in ('q', 'quit', 'exit'):
             if prompt_bool("Save before quitting?", False):
@@ -330,11 +325,10 @@ def main_menu():
             print("Unknown option.")
             pause()
 
-
 def main():
+    """Start program."""
     ensure_students()
     main_menu()
-
 
 if __name__ == "__main__":
     main()
