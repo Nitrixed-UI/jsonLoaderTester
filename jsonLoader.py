@@ -1,27 +1,37 @@
 import json
-import random
 from typing import Optional
 import csv
 import os
+from pathlib import Path
 
-DATA_FILE = r"C:\Users\bryso\OneDrive\Desktop\VS projects\json testing\data.json"
+# Portable data file path: data.json resides next to this script.
+DATA_FILE = Path(__file__).with_name("data.json")
 
-with open(DATA_FILE, 'r') as file:
-    data = json.load(file)
+# Initialize data structure: load if file exists, else start empty.
+if DATA_FILE.exists():
+    with DATA_FILE.open('r', encoding='utf-8') as file:
+        try:
+            data = json.load(file)
+        except json.JSONDecodeError:
+            print(f"Warning: Corrupt JSON in {DATA_FILE}. Starting with empty dataset.")
+            data = {"students": []}
+else:
+    data = {"students": []}
 
-def load_data(filepath: str = DATA_FILE):
-    """Reload data from disk to pick up external edits."""
+def load_data(filepath: str = str(DATA_FILE)):
+    """Reload data from disk to pick up external edits.
+    Creates a new empty file structure if the file is missing.
+    """
     global data
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
     except FileNotFoundError:
         print("Data file missing; creating new structure.")
         data = {"students": []}
+        save_data(filepath)
     except json.JSONDecodeError as e:
-        print(f"JSON decode error while reloading: {e}")
-        # keep previous in-memory data
-
+        print(f"JSON decode error while reloading: {e}. Keeping previous in-memory data.")
 
 def make_new_student(name, age, full_time):
     new_student = {
@@ -55,9 +65,9 @@ def change_student_info(student_id, name=None, age=None, full_time=None):
         return student
     return None
 
-def save_data(filepath: str = DATA_FILE):
+def save_data(filepath: str = str(DATA_FILE)):
     """Persist current in-memory data back to the JSON file."""
-    with open(filepath, 'w') as f:
+    with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
 def clear_screen():
@@ -256,6 +266,7 @@ def ensure_students():
         print("Import failed or produced zero records. Please try again.")
         pause("Press Enter to retry...")
 
+
 def main_menu():
     while True:
         load_data()  # always refresh to see external edits
@@ -319,9 +330,11 @@ def main_menu():
             print("Unknown option.")
             pause()
 
+
 def main():
     ensure_students()
     main_menu()
+
 
 if __name__ == "__main__":
     main()
