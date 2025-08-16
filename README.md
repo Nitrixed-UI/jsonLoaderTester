@@ -1,10 +1,23 @@
-# jsonLoaderTester
+# JSON File Manager (Personal Testing Device)
 
-Personal testing device for loading and managing .json files
+A simple Python-based tool for loading, managing, and converting .json files.
+Supports editing, exporting, and importing data between .json and .csv formats.
 
+⸻
 
-Run the Python File via VS Code or your Terminal
-Follow the instructions pertainign to what you want to do
-Manually edit/add data using the .json file
-export/import to a .csv using the features in the .py file
-Manually edit the .csv file for more in-depth data
+Features
+	•	Load and manage .json files
+	•	Add or edit data manually within the .json file
+	•	Export .json data to .csv
+	•	Import .csv data back into .json
+	•	Perform more detailed edits by working directly with the .csv file
+
+⸻
+
+Usage
+	1.	Clone or download this project.
+	2.	Open the Python script in VS Code or run it through your terminal.
+	3.	Follow the on-screen instructions to perform your desired operation.
+	4.	Edit files manually if needed:
+	•	Modify .json for simple edits
+	•	Modify .csv for more advanced or bulk edits
